@@ -1,0 +1,72 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import wikipedia
+import webbrowser
+
+# Initialize the text-to-speech engine
+tts_engine = pyttsx3.init('sapi5')
+voices_list = tts_engine.getProperty('voices')
+tts_engine.setProperty('voice', voices_list[1].id)
+
+def speak(text):
+    tts_engine.say(text)
+    tts_engine.runAndWait()
+
+def greet_user():
+    current_hour = int(datetime.datetime.now().hour)
+    if current_hour >= 0 and current_hour < 12:
+        speak("Good Morning!")
+    elif current_hour >= 12 and current_hour < 18:
+        speak("Good Afternoon!")
+    else:
+        speak("Good Evening!")
+
+    speak("I am Hanisha. How may I assist you?")
+
+def listen_command():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as mic_source:
+        print("Listening...")
+        recognizer.pause_threshold = 1
+        audio_input = recognizer.listen(mic_source)
+
+    try:
+        print("Recognizing...")
+        spoken_query = recognizer.recognize_google(audio_input, language='en-in')
+        print(f"User  said: {spoken_query}\n")
+    except Exception as error:
+        print(error)
+        print("Could you please repeat that?")
+        return "None"
+    return spoken_query
+
+def send_email(recipient, message):
+    email_server = smtplib.SMTP('smtp.gmail.com', 587)
+    email_server.ehlo()
+    email_server.starttls()
+    email_server.login('your_email@gmail.com', 'your_password')
+    email_server.sendmail('your_email@gmail.com', recipient, message)
+    email_server.close()
+
+if __name__ == "__main__":
+    greet_user()
+    while True:
+        user_command = listen_command().lower()
+
+       
+        if 'wikipedia' in user_command:
+            speak('Searching Wikipedia...')
+            user_command = user_command.replace("wikipedia", "")
+            wiki_results = wikipedia.summary(user_command, sentences=2)
+            speak("According to Wikipedia")
+            print(wiki_results)
+            speak(wiki_results)
+
+        elif 'open youtube' in user_command:
+            webbrowser.open("youtube.com")
+
+        elif 'open google' in user_command:
+            webbrowser.open("google.com")
+
+    
